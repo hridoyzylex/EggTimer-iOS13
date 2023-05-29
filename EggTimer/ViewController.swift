@@ -7,26 +7,32 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ViewController: UIViewController {
     
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var progressBar: UIProgressView!
     
     //    let softTime = 5
     //    let mediumTime = 7
     //    let hardTime = 12
     
     let eggTimes = ["Soft" : 3, "Medium" : 4, "Hard" : 7]
-    var secondsRemaining = 60
     var timer = Timer()
+    var totalTime = 0
+    var secondsPassed = 0
+    var player: AVAudioPlayer!
     
     @IBAction func hardnessSelected(_ sender: UIButton) {
         
         timer.invalidate()
-        
         let hardness = sender.currentTitle! //Soft, Medium, Hard
-            
-        secondsRemaining = eggTimes[hardness]!
+        totalTime = eggTimes[hardness]!
+        
+        progressBar.progress = 0.0
+        secondsPassed = 0
+        titleLabel.text = hardness
         
         //        print(eggTime[hardness]!)
         //        if (hardness == "Soft"){
@@ -41,14 +47,24 @@ class ViewController: UIViewController {
     }
     
     @objc func updateTimer(){
-        if secondsRemaining > 0{
-            print("\(secondsRemaining) seconds.")
-            secondsRemaining -= 1
+        if secondsPassed < totalTime{
+
+            secondsPassed += 1
+            progressBar.progress = Float(secondsPassed)/Float(totalTime)
+          
         }
         else {
             timer.invalidate()
             titleLabel.text = "DONE!"
+            playSound(soundName:"alarm_sound")
         }
+    }
+    
+    func playSound(soundName: String) {
+        let url = Bundle.main.url(forResource: soundName, withExtension: ".mp3")
+        player = try! AVAudioPlayer(contentsOf: url!)
+        player.play()
+                
     }
 }
 
